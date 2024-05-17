@@ -1,13 +1,11 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext
-from datetime import timedelta
-from fastapi import Depends, FastAPI, Security
+from fastapi.security import APIKeyHeader
+from fastapi import Depends, FastAPI
+from pydantic import BaseModel
 from dotenv import load_dotenv
+import requests
 import os
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 load_dotenv()
 
@@ -19,43 +17,126 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "*"
-    ],
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+auth_service_url = os.getenv("AUTH_SERVICE_URL")
+stock_service_url = os.getenv("STOCK_SERVICE_URL")
 
+auth_token = APIKeyHeader(name='X-SECRET-1', scheme_name='auth_token')
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-
-def create_access_token(data: dict, expires_delta: timedelta = None):
-    return "encoded_jwt"
-
-
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+def validate_token(token):
     try:
-        return "username"
+        if not token.startswith('Basic '):
+            return False
+        formated_token = token.replace('Basic ', '') 
+        response = requests.get(f"{auth_service_url}/validate-token?token={formated_token}")
+        if response.status_code == 200:
+            return True
+        else:
+            return False
     except Exception as e:
-        return None
+        return False
 
+class LoginRequest(BaseModel):
+  username: str
+  password: str
 
-@app.post("/login", response_class=JSONResponse, summary="Login to access the API")
-async def login(username: str = "", password: str = ""):
-    return JSONResponse(status_code=200, content={"token": "access_token"})
+@app.post(
+    "/login", 
+    response_class=JSONResponse,
+    responses={
+        200: {
+            "description": "OK",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "token": "n845yg27845yt82chn458t7h245t"
+                    }
+                }
+            }
+        },
+        401: {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {
+                    "example": {"message": "Unauthorized"},
+                }
+            }
+        },
+        500: {
+            "description": "Internal error",
+            "content": {
+                "application/json": {
+                    "example": {"message": "Internal server error"},
+                }
+            }
+        },
+    },
+)
+async def login_controller(body: LoginRequest):
+    try:
+        response = requests.post(f"{auth_service_url}/login", json={"username": body.username, "password": body.password})
+        if response.status_code == 200:
+            token = response.json().get("token")
+            return JSONResponse(status_code=200, content={"token": token})
+        else:
+            return JSONResponse(status_code=401, content={"message": "Unauthorized"})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"message": "Internal server error"})
 
-
-@app.get("/stock-data", response_class=JSONResponse)
-async def get_stock_data(token: str = Security(oauth2_scheme)):
-    # Placeholder for fetching stock data from external service
-    # You'll use the token here to authenticate with the stock service
-    # ...
-    return JSONResponse(status_code=200, content={"message": "Stock Data Placeholder"})
+@app.get(
+    "/stock",
+    response_class=JSONResponse,
+    responses={
+        200: {
+            "description": "OK",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "simbolo": "AACG.US",
+                        "nome_da_empresa": "ATA CREATIVITY GLOBAL",
+                        "cotacao": 0.9143,
+                    }
+                }
+            }
+        },
+        404: {
+            "description": "Symbol not found",
+            "content": {
+                "application/json": {
+                    "example": {"message": "Symbol not found"},
+                }
+            }
+        },
+        401: {
+            "description": "Unauthorized",
+            "content": {
+                "application/json": {
+                    "example": {"message": "Unauthorized"},
+                }
+            }
+        },
+        500: {
+            "description": "Internal error",
+            "content": {
+                "application/json": {
+                    "example": {"message": "Internal server error"},
+                }
+            }
+        },
+    },
+)
+async def get_stock_controller(symbol: str, token: str = Depends(auth_token)):
+    try:
+        if not validate_token(token):
+            return JSONResponse(status_code=401, content={"message": "Unauthorized"})
+        response = requests.get(f"{stock_service_url}/stock?symbol={symbol}")
+        if response.status_code == 200:
+            return JSONResponse(status_code=200, content=response.json())
+        else:
+            return JSONResponse(status_code=404, content={"message": "Symbol not found"})
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"message": "Internal server error"})
