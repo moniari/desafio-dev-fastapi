@@ -1,0 +1,7 @@
+fastapi>=0.110.0
+redis_om>=0.3.1
+redis>=5.0.4
+requests>=2.31.0
+pydantic >= "2.6.3"
+pydantic-settings >= "2.2.1"
+watchfiles >= "0.21.0"
