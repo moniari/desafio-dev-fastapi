@@ -1,6 +1,5 @@
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi import HTTPException
 from dotenv import load_dotenv
 from fastapi import FastAPI
 import requests
@@ -41,10 +40,10 @@ app.add_middleware(
             }
         },
         404: {
-            "description": "Simbolo não encontrado",
+            "description": "Symbol not found",
             "content": {
                 "application/json": {
-                    "example": {"message": "Simbolo não encontrado"},
+                    "example": {"message": "Symbol not found"},
                 }
             }
         },
@@ -68,10 +67,8 @@ async def get_stock(symbol: str):
         row = next(reader)
         name = row[8]
         price = row[6]
-
         if price == 'N/D':
-            return JSONResponse(status_code=404, content={"message": "Simbolo não encontrado"})
-    
+            return JSONResponse(status_code=404, content={"message": "Symbol not found"})
         return JSONResponse(
             status_code=200,
             content={
@@ -79,6 +76,5 @@ async def get_stock(symbol: str):
                 "nome_da_empresa": name,
                 "cotacao": float(price),
             })
-    
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": "Internal server error"})
