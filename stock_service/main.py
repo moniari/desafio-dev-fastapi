@@ -1,10 +1,10 @@
+from factories.stock_controller_factory import makeStockControllerFactory
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from fastapi import FastAPI
-import requests
-import csv
 import os
+
 
 load_dotenv()
 
@@ -57,24 +57,18 @@ app.add_middleware(
         },
     },
 )
-async def get_stock(symbol: str):
+async def getStock(symbol: str):
     try:
-        url = f"https://stooq.com/q/l/?s={symbol}&f=sd2t2ohlcvn&h&e=csv"
-        response = requests.get(url)
-        response.raise_for_status()
-        reader = csv.reader(response.text.splitlines())
-        row = next(reader)
-        row = next(reader)
-        name = row[8]
-        price = row[6]
-        if price == 'N/D':
+        stockController = makeStockControllerFactory()
+        stock = stockController.execute(symbol)
+        if not stock:
             return JSONResponse(status_code=404, content={"message": "Symbol not found"})
         return JSONResponse(
             status_code=200,
             content={
-                "simbolo": symbol,
-                "nome_da_empresa": name,
-                "cotacao": float(price),
+                "simbolo": stock["symbol"],
+                "nome_da_empresa": stock["name"],
+                "cotacao": float(stock["price"]),
             })
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": "Internal server error"})
