@@ -1,10 +1,12 @@
+from factories.middlewares.user_auth_middleware_factory import makeUserAuthMiddlewareFactory
+from factories.controllers.login_controller_factory import makeLoginControllerFactory
+from factories.controllers.stock_controller_factory import makeStockControllerFactory
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyHeader
 from fastapi import Depends, FastAPI
-from pydantic import BaseModel
+from dtos.login_dto import LoginDto
 from dotenv import load_dotenv
-import requests
 import os
 
 load_dotenv()
@@ -22,27 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-auth_service_url = os.getenv("AUTH_SERVICE_URL")
-stock_service_url = os.getenv("STOCK_SERVICE_URL")
-
 auth_token = APIKeyHeader(name='X-SECRET-1', scheme_name='auth_token')
-
-def validate_token(token):
-    try:
-        if not token.startswith('Basic '):
-            return False
-        formated_token = token.replace('Basic ', '') 
-        response = requests.get(f"{auth_service_url}/validate-token?token={formated_token}")
-        if response.status_code == 200:
-            return True
-        else:
-            return False
-    except Exception as e:
-        return False
-
-class LoginRequest(BaseModel):
-  username: str
-  password: str
 
 @app.post(
     "/login", 
@@ -76,11 +58,11 @@ class LoginRequest(BaseModel):
         },
     },
 )
-async def login_controller(body: LoginRequest):
+async def makeLogin(body: LoginDto):
     try:
-        response = requests.post(f"{auth_service_url}/login", json={"username": body.username, "password": body.password})
-        if response.status_code == 200:
-            token = response.json().get("token")
+        loginController = makeLoginControllerFactory()
+        token = loginController.execute(body)
+        if token:
             return JSONResponse(status_code=200, content={"token": token})
         else:
             return JSONResponse(status_code=401, content={"message": "Unauthorized"})
@@ -129,13 +111,16 @@ async def login_controller(body: LoginRequest):
         },
     },
 )
-async def get_stock_controller(symbol: str, token: str = Depends(auth_token)):
+async def getStock(symbol: str, token: str = Depends(auth_token)):
     try:
-        if not validate_token(token):
+        middleware = makeUserAuthMiddlewareFactory()
+        validToken = middleware.execute(token)
+        if not validToken:
             return JSONResponse(status_code=401, content={"message": "Unauthorized"})
-        response = requests.get(f"{stock_service_url}/stock?symbol={symbol}")
-        if response.status_code == 200:
-            return JSONResponse(status_code=200, content=response.json())
+        stockController = makeStockControllerFactory()
+        content = stockController.execute(symbol)
+        if content:
+            return JSONResponse(status_code=200, content=content)
         else:
             return JSONResponse(status_code=404, content={"message": "Symbol not found"})
     except Exception as e:
