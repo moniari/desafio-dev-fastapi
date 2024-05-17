@@ -7,12 +7,11 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     USERNAME: str
     PASSWORD: str
-    STOCK_SERVICE_URL: str
     REDIS_HOST: str
     REDIS_PORT: str
 
     class Config:
-        env_file = "./api_service/.env"
+        env_file = "./user_registration_service/.env"
         env_file_encoding = "utf-8"
 
 

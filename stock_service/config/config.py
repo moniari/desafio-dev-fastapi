@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str
     USERNAME: str
     PASSWORD: str
+    REDIS_HOST: str
+    REDIS_PORT: str
 
     class Config:
         env_file = "./stock_service/.env"
