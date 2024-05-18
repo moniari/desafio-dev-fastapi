@@ -3,20 +3,19 @@ import { LoadingSpinner } from "src/presentation/components/loading-spinner/load
 import { FormTitleComponent } from "src/presentation/components/form-title/form-title-component";
 import { GetStockByNameUseCase } from "src/domain/usecases/stock/get-stock-by-name-usecase";
 import { InputComponent } from "src/presentation/components/input/input-component";
-import { StockEntity } from "src/domain/abstract/entities/stock-entity";
+import { StockInfoDto } from "src/domain/abstract/dtos/stock/stock-info-dto";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./styles.scss";
-import { StockInfoDto } from "src/domain/abstract/dtos/stock/stock-info-dto";
 
 type Props = {
-  GetStockByNameUseCase: GetStockByNameUseCase;
+  getStockByNameUseCase: GetStockByNameUseCase;
 };
 
 export const GetOneStockPage: React.FC<Props> = ({
-  GetStockByNameUseCase,
+  getStockByNameUseCase,
 }: Props) => {
-  const { id } = useParams();
+  const { symbol } = useParams();
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState({
     message: "",
@@ -37,9 +36,9 @@ export const GetOneStockPage: React.FC<Props> = ({
   };
 
   useEffect(() => {
-    if (id) {
+    if (symbol) {
       setLoading(true);
-      GetStockByNameUseCase.execute(id)
+      getStockByNameUseCase.execute(symbol)
         .then((data) => {
           if (data instanceof Error) {
             handleError(data.message);

@@ -19,16 +19,16 @@ const makeGetStockByNameUseCaseStub = (): GetStockByNameUseCase => {
   );
 };
 
-const makeSut = (mocks?: SutMockTypes, id = FakeData.id()): void => {
+const makeSut = (mocks?: SutMockTypes, name = FakeData.word()): void => {
   render(
     <>
       {DomTestHelpers.addRouter(
         [
           {
-            route: "/get-one-stock/:id",
+            route: "/stock/:symbol",
             element: (
               <GetOneStockPage
-                GetStockByNameUseCase={
+                getStockByNameUseCase={
                   mocks?.GetStockByNameUseCase ??
                   makeGetStockByNameUseCaseStub()
                 }
@@ -36,38 +36,38 @@ const makeSut = (mocks?: SutMockTypes, id = FakeData.id()): void => {
             ),
           },
         ],
-        `/get-one-stock/${id}`
+        `/stock/${name}`
       )}
     </>
   );
 };
 
 describe("GetOneStockPage", () => {
-  test("Should call GetStockByNameUseCase with correct id", async () => {
+  test("Should call GetStockByNameUseCase with correct name", async () => {
     const stockData = makeFakeStockInfoDto();
-    const getStockByIdServiceMock = makeGetStockByNameUseCaseStub();
-    const getStockByIdServiceSpy = jest.spyOn(
-      getStockByIdServiceMock,
+    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
+    const getStockByNameServiceSpy = jest.spyOn(
+      getStockByNameServiceMock,
       "execute"
     );
     jest
-      .spyOn(getStockByIdServiceMock, "execute")
+      .spyOn(getStockByNameServiceMock, "execute")
       .mockResolvedValueOnce(Promise.resolve(makeFakeStockInfoDto()));
     makeSut(
-      { GetStockByNameUseCase: getStockByIdServiceMock },
+      { GetStockByNameUseCase: getStockByNameServiceMock },
       stockData.simbolo
     );
     await waitFor(() => {
-      expect(getStockByIdServiceSpy).toHaveBeenCalledTimes(1);
-      expect(getStockByIdServiceSpy).toHaveBeenCalledWith(stockData.simbolo);
+      expect(getStockByNameServiceSpy).toHaveBeenCalledTimes(1);
+      expect(getStockByNameServiceSpy).toHaveBeenCalledWith(stockData.simbolo);
     });
   });
 
   test("Should show loading spinner when GetStockByNameUseCase is called", async () => {
     const stockData = makeFakeStockInfoDto();
-    const getStockByIdServiceMock = makeGetStockByNameUseCaseStub();
+    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
     jest
-      .spyOn(getStockByIdServiceMock, "execute")
+      .spyOn(getStockByNameServiceMock, "execute")
       .mockImplementationOnce(async () => {
         return new Promise(async (resolve) => {
           setTimeout(() => {
@@ -76,7 +76,7 @@ describe("GetOneStockPage", () => {
         });
       });
     makeSut(
-      { GetStockByNameUseCase: getStockByIdServiceMock },
+      { GetStockByNameUseCase: getStockByNameServiceMock },
       stockData.simbolo
     );
     const loadingSpinner = DomTestHelpers.getElementById("loading-spinner");
@@ -93,12 +93,12 @@ describe("GetOneStockPage", () => {
 
   test("Should set the correct stock data", async () => {
     const stockData = makeFakeStockInfoDto();
-    const getStockByIdServiceMock = makeGetStockByNameUseCaseStub();
+    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
     jest
-      .spyOn(getStockByIdServiceMock, "execute")
+      .spyOn(getStockByNameServiceMock, "execute")
       .mockResolvedValueOnce(Promise.resolve(stockData));
     makeSut(
-      { GetStockByNameUseCase: getStockByIdServiceMock },
+      { GetStockByNameUseCase: getStockByNameServiceMock },
       stockData.simbolo
     );
 
@@ -118,14 +118,14 @@ describe("GetOneStockPage", () => {
 
   test("Should show the error message if GetStockByNameUseCase returns an error", async () => {
     const errorMessage = FakeData.phrase();
-    const getStockByIdServiceMock = makeGetStockByNameUseCaseStub();
+    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
     jest
-      .spyOn(getStockByIdServiceMock, "execute")
+      .spyOn(getStockByNameServiceMock, "execute")
       .mockImplementationOnce(async () => {
         return new Error(errorMessage);
       });
     await waitFor(() => {
-      makeSut({ GetStockByNameUseCase: getStockByIdServiceMock });
+      makeSut({ GetStockByNameUseCase: getStockByNameServiceMock });
     });
     const screenErrorMessage = DomTestHelpers.getElementById("error-message");
     expect(screenErrorMessage?.innerHTML).toBe(errorMessage);
@@ -133,14 +133,14 @@ describe("GetOneStockPage", () => {
 
   test("Should show the error message if GetStockByNameUseCase throws", async () => {
     const errorMessage = FakeData.phrase();
-    const getStockByIdServiceMock = makeGetStockByNameUseCaseStub();
+    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
     jest
-      .spyOn(getStockByIdServiceMock, "execute")
+      .spyOn(getStockByNameServiceMock, "execute")
       .mockImplementationOnce(async () => {
         throw new Error(errorMessage);
       });
     await waitFor(() => {
-      makeSut({ GetStockByNameUseCase: getStockByIdServiceMock });
+      makeSut({ GetStockByNameUseCase: getStockByNameServiceMock });
     });
     await waitFor(() => {
       const screenErrorMessage = DomTestHelpers.getElementById("error-message");
@@ -152,12 +152,12 @@ describe("GetOneStockPage", () => {
 
   test("Should lock the input fields", async () => {
     const stockData = makeFakeStockInfoDto();
-    const getStockByIdServiceMock = makeGetStockByNameUseCaseStub();
+    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
     jest
-      .spyOn(getStockByIdServiceMock, "execute")
+      .spyOn(getStockByNameServiceMock, "execute")
       .mockResolvedValueOnce(Promise.resolve(stockData));
     makeSut(
-      { GetStockByNameUseCase: getStockByIdServiceMock },
+      { GetStockByNameUseCase: getStockByNameServiceMock },
       stockData.simbolo
     );
     await waitFor(() => {

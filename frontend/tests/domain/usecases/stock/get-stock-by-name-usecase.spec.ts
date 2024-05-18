@@ -61,13 +61,13 @@ describe("GetStockByNameUseCase", () => {
 
   test("Should return the StockPriceApi output data", async () => {
     const { sut, stockPriceApi } = makeSut();
-    const stockEntity = makeFakeStockInfoDto();
+    const stockInfo = makeFakeStockInfoDto();
     jest
       .spyOn(stockPriceApi, "execute")
-      .mockReturnValueOnce(Promise.resolve(stockEntity));
+      .mockReturnValueOnce(Promise.resolve(stockInfo));
     const data = await sut.execute(FakeData.word());
 
-    expect(data).toEqual(stockEntity);
+    expect(data).toEqual(stockInfo);
   });
 
   test("Should throw if StockPriceApi throws", async () => {
