@@ -14,7 +14,7 @@ export class LoginApiGateway implements LoginApiInterface {
     this.clientPostRequestSender = clientPostRequestSender;
   }
 
-  public async login(loginData: LoginDto): Promise<string | null> {
+  public async execute(loginData: LoginDto): Promise<string | null> {
     const response = await this.clientPostRequestSender.post(
       this.loginUrl,
       loginData

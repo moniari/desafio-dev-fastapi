@@ -1,34 +1,27 @@
-import { ClientPostRequestSenderInterface } from "src/domain/abstract/adapters/client-post-request-sender-interface";
 import { TokenStorageInterface } from "src/domain/abstract/adapters/token-storage-interface";
-import { LoginEntity } from "src/domain/abstract/entities/login-entity";
+import { LoginApiInterface } from "src/domain/abstract/gateways/login-api-interface";
 import { LoginDto } from "src/domain/abstract/dtos/login/login-dto";
 import { DefaultError } from "src/domain/errors/default-error";
-import { ApiError } from "src/domain/errors/api-error";
 
 export class LoginUseCase {
-  private readonly url: string;
-  private readonly clientPostRequestSender: ClientPostRequestSenderInterface;
+  private readonly loginApi: LoginApiInterface;
   private readonly tokenStorage: TokenStorageInterface;
 
   public constructor(
-    loginUrl: string,
-    clientPostRequestSender: ClientPostRequestSenderInterface,
+    loginApi: LoginApiInterface,
     tokenStorage: TokenStorageInterface
   ) {
-    this.url = loginUrl;
-    this.clientPostRequestSender = clientPostRequestSender;
+    this.loginApi = loginApi;
     this.tokenStorage = tokenStorage;
   }
 
-  public async execute(input: LoginDto): Promise<LoginEntity | Error> {
-    const data = await this.clientPostRequestSender.post(this.url, input);
-    if (!data || !data.token) {
-      return new DefaultError();
-    } else if (data.error) {
-      return new ApiError(data.error);
+  public async execute(input: LoginDto): Promise<boolean | Error> {
+    const token = await this.loginApi.execute(input);
+    if (token) {
+      await this.tokenStorage.store("token", token);
+      return true;
     } else {
-      await this.tokenStorage.store("token", data.token);
-      return data;
+      return new DefaultError();
     }
   }
 }
