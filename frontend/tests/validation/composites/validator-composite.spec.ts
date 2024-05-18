@@ -23,8 +23,8 @@ const makeSut = (): SutTypes => {
 };
 
 const mockData = () => ({
-  email_field: "any_email",
-  valid_field: "any_value",
+  email_field: FakeData.email(),
+  valid_field: FakeData.email(),
 });
 
 describe("ValidatorComposite", () => {
@@ -32,12 +32,16 @@ describe("ValidatorComposite", () => {
     const { sut, validatorStub1, validatorStub2 } = makeSut();
     const validatorStubSpy1 = jest.spyOn(validatorStub1, "validate");
     const validatorStubSpy2 = jest.spyOn(validatorStub2, "validate");
-    sut.validate(mockData());
+    const data = {
+      email_field: FakeData.email(),
+      valid_field: FakeData.email(),
+    };
+    sut.validate(data);
 
     expect(validatorStubSpy1).toHaveBeenCalledTimes(1);
-    expect(validatorStubSpy1).toHaveBeenCalledWith(mockData());
+    expect(validatorStubSpy1).toHaveBeenCalledWith(data);
     expect(validatorStubSpy2).toHaveBeenCalledTimes(1);
-    expect(validatorStubSpy2).toHaveBeenCalledWith(mockData());
+    expect(validatorStubSpy2).toHaveBeenCalledWith(data);
   });
 
   it("Validate should return an error if a validator returns an error", () => {

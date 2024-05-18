@@ -23,7 +23,7 @@ describe("LoginApiGateway", () => {
       password: FakeData.word(),
     };
     const clientPostSpy = jest.spyOn(clientPostRequestSender, "post");
-    await sut.login(loginData);
+    await sut.execute(loginData);
 
     expect(clientPostSpy).toHaveBeenCalledWith(url, loginData);
     expect(clientPostSpy).toHaveBeenCalledTimes(1);
@@ -35,7 +35,7 @@ describe("LoginApiGateway", () => {
     jest.spyOn(clientPostRequestSender, "post").mockResolvedValueOnce({
       token: token,
     });
-    const response = await sut.login({
+    const response = await sut.execute({
       email: FakeData.email(),
       password: FakeData.word(),
     });
@@ -46,7 +46,7 @@ describe("LoginApiGateway", () => {
   test("Should return null if ClientPostRequestSender do not return a token", async () => {
     const { sut, clientPostRequestSender } = makeSut();
     jest.spyOn(clientPostRequestSender, "post").mockResolvedValueOnce({});
-    const response = await sut.login({
+    const response = await sut.execute({
       email: FakeData.email(),
       password: FakeData.word(),
     });
@@ -57,7 +57,7 @@ describe("LoginApiGateway", () => {
   test("Should return null if ClientPostRequestSender return null", async () => {
     const { sut, clientPostRequestSender } = makeSut();
     jest.spyOn(clientPostRequestSender, "post").mockResolvedValueOnce(null);
-    const response = await sut.login({
+    const response = await sut.execute({
       email: FakeData.email(),
       password: FakeData.word(),
     });
@@ -68,7 +68,7 @@ describe("LoginApiGateway", () => {
 //   test("Should throw if if ClientPostRequestSender return null", async () => {
 //     const { sut, clientPostRequestSender } = makeSut();
 //     jest.spyOn(clientPostRequestSender, "post").mockResolvedValueOnce(null);
-//     const response = await sut.login({
+//     const response = await sut.execute({
 //       email: FakeData.email(),
 //       password: FakeData.word(),
 //     });
