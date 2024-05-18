@@ -17,6 +17,9 @@ export class LoginUseCase {
 
   public async execute(input: LoginDto): Promise<boolean | Error> {
     const token = await this.loginApi.execute(input);
+    if (token instanceof Error) {
+      return token;
+    }
     if (token) {
       await this.tokenStorage.store("token", token);
       return true;

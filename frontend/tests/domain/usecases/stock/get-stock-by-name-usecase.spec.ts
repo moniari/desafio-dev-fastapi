@@ -7,6 +7,7 @@ import { TokenStorageStub } from "tests/utils/stubs/adapters/token-storage-stub"
 import { StockPriceApiGateway } from "src/gateways/stock-price-api-gateway";
 import { DefaultError } from "src/domain/errors/default-error";
 import { FakeData } from "tests/utils/data/fake-data";
+import { ApiError } from "src/domain/errors/api-error";
 
 type SutTypes = {
   sut: GetStockByNameUseCase;
@@ -76,6 +77,17 @@ describe("GetStockByNameUseCase", () => {
     });
 
     expect(async () => await sut.execute(FakeData.word())).rejects.toThrow();
+  });
+
+  test("Should return an error if StockPriceApi returns an error", async () => {
+    const { sut, stockPriceApi } = makeSut();
+    const errorMessage = FakeData.phrase();
+    jest
+      .spyOn(stockPriceApi, "execute")
+      .mockResolvedValueOnce(new ApiError(errorMessage));
+    const error = await sut.execute(FakeData.word());
+
+    expect(error).toEqual(new ApiError(errorMessage));
   });
 
   test("Should return an error if StockPriceApi returns null", async () => {

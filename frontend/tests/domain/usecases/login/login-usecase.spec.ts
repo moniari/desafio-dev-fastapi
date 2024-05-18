@@ -6,6 +6,7 @@ import { makeFakeLoginDto } from "tests/utils/data/dtos/login/fake-login-dto";
 import { LoginUseCase } from "src/domain/usecases/login/login-usecase";
 import { DefaultError } from "src/domain/errors/default-error";
 import { FakeData } from "tests/utils/data/fake-data";
+import { ApiError } from "src/domain/errors/api-error";
 
 type SutTypes = {
   sut: LoginUseCase;
@@ -38,6 +39,15 @@ describe("LoginUseCase", () => {
     });
 
     expect(async () => await sut.execute(makeFakeLoginDto())).rejects.toThrow();
+  });
+
+  test("Should return an error if LoginApi returns an error", async () => {
+    const { sut, loginApiGateway } = makeSut();
+    const errorMessage = FakeData.phrase();
+    jest.spyOn(loginApiGateway, "execute").mockResolvedValueOnce(new ApiError(errorMessage));
+    const error = await sut.execute(makeFakeLoginDto());
+
+    expect(error).toEqual(new ApiError(errorMessage));
   });
 
   test("Should return an error if LoginApi returns null", async () => {
