@@ -7,6 +7,8 @@ class StockController:
         if not self.__get_stock_request_validator.validate(symbol):
             return False
         stock = self.__stock_service.get_stock(symbol)
+        if not stock:
+            return False
         price = stock["cotacao"]
         if price == 'N/D':
             return False
