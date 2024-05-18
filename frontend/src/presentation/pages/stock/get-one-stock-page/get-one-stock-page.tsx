@@ -19,7 +19,7 @@ type Props = {
 export const GetOneStockPage: React.FC<Props> = ({
   getStockByNameUseCase,
 }: Props) => {
-  const [lockSubmit, setLockSubmit] = useState(true);
+  const [lockSubmit, setLockSubmit] = useState(false);
   const [searchTerm, setSearchTerm] = useState("aapl.us");
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState({
