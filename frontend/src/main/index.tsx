@@ -13,7 +13,7 @@ const Router = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" Component={makeLoginPageFactory} />
-          <Route path="/stock/:symbol" Component={makeGetOneStockPageFactory} />
+          <Route path="/stock" Component={makeGetOneStockPageFactory} />
         </Routes>
       </BrowserRouter>
     </>

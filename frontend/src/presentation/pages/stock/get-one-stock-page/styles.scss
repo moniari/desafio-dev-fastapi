@@ -8,6 +8,7 @@
   height: 100vh;
   margin: 0;
   background-color: $MediumLightColor;
+  flex-direction: column;
 }
         
 .form-container {
@@ -18,4 +19,5 @@
   width: 300px;
   display: flex;
   flex-direction: column;
+  margin: 2px;
 }

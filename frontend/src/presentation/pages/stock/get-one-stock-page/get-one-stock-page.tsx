@@ -1,12 +1,16 @@
 import { ErrorMessageComponent } from "src/presentation/components/error-message/error-message-component";
 import { LoadingSpinner } from "src/presentation/components/loading-spinner/loading-spinner-component";
 import { FormTitleComponent } from "src/presentation/components/form-title/form-title-component";
+import { ParagraphComponent } from "src/presentation/components/paragraph/paragraph-component";
 import { GetStockByNameUseCase } from "src/domain/usecases/stock/get-stock-by-name-usecase";
 import { InputComponent } from "src/presentation/components/input/input-component";
 import { StockInfoDto } from "src/domain/abstract/dtos/stock/stock-info-dto";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import React, { useState } from "react";
 import "./styles.scss";
+import {
+  ButtonComponent,
+  ButtonTypeEnum,
+} from "src/presentation/components/button/button-component";
 
 type Props = {
   getStockByNameUseCase: GetStockByNameUseCase;
@@ -15,7 +19,8 @@ type Props = {
 export const GetOneStockPage: React.FC<Props> = ({
   getStockByNameUseCase,
 }: Props) => {
-  const { symbol } = useParams();
+  const [lockSubmit, setLockSubmit] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("aapl.us");
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState({
     message: "",
@@ -35,25 +40,33 @@ export const GetOneStockPage: React.FC<Props> = ({
     }));
   };
 
-  useEffect(() => {
-    if (symbol) {
-      setLoading(true);
-      getStockByNameUseCase.execute(symbol)
-        .then((data) => {
-          if (data instanceof Error) {
-            handleError(data.message);
-          } else {
-            setStockData(data);
-          }
-        })
-        .catch((error: any) => {
-          handleError(error.message);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+    if (event.target.value.toString().trim() !== "") {
+      setLockSubmit(false);
     }
-  }, []);
+  };
+
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
+    setLoading(true);
+    getStockByNameUseCase
+      .execute(searchTerm)
+      .then((data) => {
+        if (data instanceof Error) {
+          handleError(data.message);
+        } else {
+          setStockData(data);
+          handleError("");
+        }
+      })
+      .catch((error) => {
+        handleError(error.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   return (
     <div className="get-one-stock-page">
@@ -63,17 +76,40 @@ export const GetOneStockPage: React.FC<Props> = ({
         <InputComponent
           label="Symbol"
           type="text"
-          name="simbolo"
-          value={stockData?.simbolo?.toString() || ""}
-          onChange={() => {}}
-          disabled={true}
+          name="symbol"
+          value={searchTerm}
+          onChange={handleChange}
+          disabled={false}
         />
 
         {formError.show && (
           <ErrorMessageComponent message={formError.message} />
         )}
+
+        <ButtonComponent
+          disabled={lockSubmit}
+          name="Submit"
+          type={ButtonTypeEnum.SUBMIT}
+          onClickCallback={handleSubmit}
+        />
       </form>
-      <LoadingSpinner loading={loading} />
+
+      {loading && <LoadingSpinner loading={loading} />}
+
+      <div className="form-container">
+        <ParagraphComponent
+          name="symbol"
+          message={`Symbol: ${stockData.simbolo}`}
+        />
+        <ParagraphComponent
+          name="companyname"
+          message={`Company name: ${stockData.nome_da_empresa}`}
+        />
+        <ParagraphComponent
+          name="price"
+          message={`Price: $${stockData.cotacao}`}
+        />
+      </div>
     </div>
   );
 };
