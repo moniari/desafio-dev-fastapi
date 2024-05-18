@@ -81,7 +81,7 @@ export const LoginPage: React.FC<Props> = ({
   return (
     <div className="create-login-page">
       <form onSubmit={onFormSubmit} className="form-container">
-        <FormTitleComponent title="Create Login" />
+        <FormTitleComponent title="Login" />
 
         <InputComponent
           label="Email"
