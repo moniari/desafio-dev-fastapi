@@ -4,7 +4,7 @@ import { StockEntity } from "src/domain/abstract/entities/stock-entity";
 import { DefaultError } from "../../errors/default-error";
 import { ApiError } from "../../errors/api-error";
 
-export class GetStockByIdUseCase {
+export class GetStockByNameUseCase {
   private readonly url: string;
   private readonly clientGetRequestSender: ClientGetRequestSenderInterface;
   private readonly tokenStorage: TokenStorageInterface;

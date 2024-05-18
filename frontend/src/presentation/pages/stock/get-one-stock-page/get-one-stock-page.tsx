@@ -1,7 +1,7 @@
 import { ErrorMessageComponent } from "src/presentation/components/error-message/error-message-component";
 import { LoadingSpinner } from "src/presentation/components/loading-spinner/loading-spinner-component";
 import { FormTitleComponent } from "src/presentation/components/form-title/form-title-component";
-import { GetStockByIdUseCase } from "src/domain/usecases/stock/get-stock-by-id-usecase";
+import { GetStockByNameUseCase } from "src/domain/usecases/stock/get-stock-by-name-usecase";
 import { InputComponent } from "src/presentation/components/input/input-component";
 import { StockEntity } from "src/domain/abstract/entities/stock-entity";
 import React, { useEffect, useState } from "react";
@@ -9,11 +9,11 @@ import { useParams } from "react-router-dom";
 import "./styles.scss";
 
 type Props = {
-  getStockByIdUseCase: GetStockByIdUseCase;
+  GetStockByNameUseCase: GetStockByNameUseCase;
 };
 
 export const GetOneStockPage: React.FC<Props> = ({
-  getStockByIdUseCase,
+  GetStockByNameUseCase,
 }: Props) => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ export const GetOneStockPage: React.FC<Props> = ({
   useEffect(() => {
     if (id) {
       setLoading(true);
-      getStockByIdUseCase
+      GetStockByNameUseCase
         .execute(id)
         .then((data) => {
           if (data instanceof Error) {

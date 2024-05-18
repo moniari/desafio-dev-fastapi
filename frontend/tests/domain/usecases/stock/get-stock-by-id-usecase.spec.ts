@@ -3,7 +3,7 @@ import { ClientGetRequestSenderInterface } from "src/domain/abstract/adapters/cl
 import { ClientGetRequestSenderStub } from "tests/utils/stubs/http/client-get-request-sender-stub";
 import { TokenStorageInterface } from "src/domain/abstract/adapters/token-storage-interface";
 import { makeFakeStockEntity } from "tests/utils/data/entities/stock/fake-stock-entity";
-import { GetStockByIdUseCase } from "src/domain/usecases/stock/get-stock-by-id-usecase";
+import { GetStockByNameUseCase } from "src/domain/usecases/stock/get-stock-by-name-usecase";
 import { TokenStorageStub } from "tests/utils/stubs/adapters/token-storage-stub";
 import { DefaultError } from "src/domain/errors/default-error";
 import { ApiError } from "src/domain/errors/api-error";
@@ -12,7 +12,7 @@ import { FakeData } from "tests/utils/data/fake-data";
 const authToken = FakeData.password();
         
 type SutTypes = {
-  sut: GetStockByIdUseCase;
+  sut: GetStockByNameUseCase;
   clientGetRequestSender: ClientGetRequestSenderInterface;
   tokenStorage: TokenStorageInterface;
 };
@@ -20,7 +20,7 @@ type SutTypes = {
 const makeSut = (stockSearchUrl = FakeData.url()): SutTypes => {
   const clientGetRequestSender = new ClientGetRequestSenderStub();
   const tokenStorage = new TokenStorageStub();
-  const sut = new GetStockByIdUseCase(
+  const sut = new GetStockByNameUseCase(
     stockSearchUrl,
     clientGetRequestSender,
     tokenStorage
@@ -29,7 +29,7 @@ const makeSut = (stockSearchUrl = FakeData.url()): SutTypes => {
   return { sut, clientGetRequestSender, tokenStorage };
 };
         
-describe("GetStockByIdUseCase", () => {
+describe("GetStockByNameUseCase", () => {
   test("Should call TokenStorage with correct values", async () => {
     const { sut, tokenStorage } = makeSut();
     const storageSpy = jest.spyOn(tokenStorage, "get");

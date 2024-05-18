@@ -1,8 +1,8 @@
 import { makeFakeStockEntity } from "tests/utils/data/entities/stock/fake-stock-entity";
-import { GetStockByIdUseCase } from "src/domain/usecases/stock/get-stock-by-id-usecase";
+import { GetStockByNameUseCase } from "src/domain/usecases/stock/get-stock-by-name-usecase";
 import { StockEntity } from "src/domain/abstract/entities/stock-entity";
 
-export class GetStockByIdUseCaseStub extends GetStockByIdUseCase {
+export class GetStockByNameUseCaseStub extends GetStockByNameUseCase {
   public override async execute(id: string): Promise<StockEntity | Error> {
     return makeFakeStockEntity();
   }
