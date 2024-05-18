@@ -9,7 +9,7 @@ import { render, waitFor } from "@testing-library/react";
 import { FakeData } from "tests/utils/data/fake-data";
 
 type SutMockTypes = {
-  GetStockByNameUseCase?: GetStockByNameUseCase;
+  getStockByNameUseCase?: GetStockByNameUseCase;
 };
 
 const makeGetStockByNameUseCaseStub = (): GetStockByNameUseCase => {
@@ -19,150 +19,156 @@ const makeGetStockByNameUseCaseStub = (): GetStockByNameUseCase => {
   );
 };
 
-const makeSut = (mocks?: SutMockTypes, name = FakeData.word()): void => {
+const makeSut = (mocks?: SutMockTypes): void => {
   render(
     <>
       {DomTestHelpers.addRouter(
         [
           {
-            route: "/stock/:symbol",
+            route: "/stock",
             element: (
               <GetOneStockPage
                 getStockByNameUseCase={
-                  mocks?.GetStockByNameUseCase ??
+                  mocks?.getStockByNameUseCase ??
                   makeGetStockByNameUseCaseStub()
                 }
               />
             ),
           },
         ],
-        `/stock/${name}`
+        "/stock"
       )}
     </>
   );
 };
 
 describe("GetOneStockPage", () => {
-  test("Should call GetStockByNameUseCase with correct name", async () => {
-    const stockData = makeFakeStockInfoDto();
-    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
-    const getStockByNameServiceSpy = jest.spyOn(
-      getStockByNameServiceMock,
-      "execute"
-    );
-    jest
-      .spyOn(getStockByNameServiceMock, "execute")
-      .mockResolvedValueOnce(Promise.resolve(makeFakeStockInfoDto()));
-    makeSut(
-      { GetStockByNameUseCase: getStockByNameServiceMock },
-      stockData.simbolo
-    );
+  test("Should initiate with empty values", async () => {
+    makeSut();
+    const formTitle = DomTestHelpers.getElementById("form-title-stock");
+    const symbolInput = DomTestHelpers.getInputElementById("symbol-input");
+    const submitButton = DomTestHelpers.getButtonElementById("submit-button");
+    const screenErrorMessage = DomTestHelpers.getElementById("error-message");
+    const loadingSpinner = DomTestHelpers.getElementById("loading-spinner");
+    const symbol = DomTestHelpers.getElementById("symbol-paragraph");
+    const companyName = DomTestHelpers.getElementById("companyname-paragraph");
+    const price = DomTestHelpers.getElementById("price-paragraph");
+
+    // expect(symbolInput?.value?.toString()).toBe("".toString());
+    expect(formTitle?.innerHTML).toBe("Stock");
+    expect(submitButton.disabled).toBeTruthy();
+    expect(screenErrorMessage).toBeNull();
+    expect(loadingSpinner).toBeNull();
+    expect(symbol?.innerHTML).toBe("Symbol: ");
+    expect(companyName?.innerHTML).toBe("Company name: ");
+    expect(price?.innerHTML).toBe("Price: $0");
+  });
+
+  test("Should enable submit button when symbol is filled", async () => {
+    makeSut();
+    await DomTestHelpers.changeInputValue("symbol-input", FakeData.word());
     await waitFor(() => {
-      expect(getStockByNameServiceSpy).toHaveBeenCalledTimes(1);
-      expect(getStockByNameServiceSpy).toHaveBeenCalledWith(stockData.simbolo);
+      const submitButton = DomTestHelpers.getButtonElementById("submit-button");
+      expect(submitButton.disabled).toBeFalsy();
     });
   });
 
-  test("Should show loading spinner when GetStockByNameUseCase is called", async () => {
+  test("Should call GetStockByNameUseCase when submit button is clicked", async () => {
     const stockData = makeFakeStockInfoDto();
-    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
-    jest
-      .spyOn(getStockByNameServiceMock, "execute")
-      .mockImplementationOnce(async () => {
-        return new Promise(async (resolve) => {
-          setTimeout(() => {
-            resolve(makeFakeStockInfoDto()), 500;
-          });
-        });
-      });
-    makeSut(
-      { GetStockByNameUseCase: getStockByNameServiceMock },
-      stockData.simbolo
-    );
-    const loadingSpinner = DomTestHelpers.getElementById("loading-spinner");
-    expect(loadingSpinner).toBeTruthy();
-  });
+    const getStockServiceStub = makeGetStockByNameUseCaseStub();
+    const stockServiceSpy = jest.spyOn(getStockServiceStub, "execute");
+    jest.spyOn(getStockServiceStub, "execute").mockResolvedValueOnce(stockData);
+    makeSut({ getStockByNameUseCase: getStockServiceStub });
 
-  test("Should remove loading spinner after GetStockByNameUseCase returns", async () => {
-    await waitFor(() => {
-      makeSut();
-    });
-    const loadingSpinner = DomTestHelpers.getElementById("loading-spinner");
-    expect(loadingSpinner).toBeFalsy();
-  });
-
-  test("Should set the correct stock data", async () => {
-    const stockData = makeFakeStockInfoDto();
-    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
-    jest
-      .spyOn(getStockByNameServiceMock, "execute")
-      .mockResolvedValueOnce(Promise.resolve(stockData));
-    makeSut(
-      { GetStockByNameUseCase: getStockByNameServiceMock },
-      stockData.simbolo
-    );
+    await DomTestHelpers.changeInputValue("symbol-input", stockData.simbolo);
+    await DomTestHelpers.clickButton("submit-button");
 
     await waitFor(() => {
-      const screenErrorMessage = DomTestHelpers.getElementById("error-message");
-      const loadingSpinner = DomTestHelpers.getElementById("loading-spinner");
-      const formTitle = DomTestHelpers.getElementById("form-title-stock");
-      const symbolInput = DomTestHelpers.getInputElementById("simbolo-input");
-      expect(formTitle?.innerHTML).toBe("Stock");
-      expect(screenErrorMessage).toBeNull();
-      expect(loadingSpinner).toBeNull();
-      expect(symbolInput?.value?.toString()).toBe(
+      expect(stockServiceSpy).toHaveBeenCalledTimes(1);
+      expect(stockServiceSpy.mock.calls[0][0]).toEqual(
         stockData?.simbolo?.toString()
       );
     });
   });
 
-  test("Should show the error message if GetStockByNameUseCase returns an error", async () => {
-    const errorMessage = FakeData.phrase();
-    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
-    jest
-      .spyOn(getStockByNameServiceMock, "execute")
-      .mockImplementationOnce(async () => {
-        return new Error(errorMessage);
-      });
+  test("Should set stock info when GetStockByNameUseCase returns the data", async () => {
+    const stockData = makeFakeStockInfoDto();
+    const getStockServiceStub = makeGetStockByNameUseCaseStub();
+    jest.spyOn(getStockServiceStub, "execute").mockResolvedValueOnce(stockData);
+    makeSut({ getStockByNameUseCase: getStockServiceStub });
+
+    await DomTestHelpers.changeInputValue("symbol-input", stockData.simbolo);
+    await DomTestHelpers.clickButton("submit-button");
+
     await waitFor(() => {
-      makeSut({ GetStockByNameUseCase: getStockByNameServiceMock });
+      const symbol = DomTestHelpers.getElementById("symbol-paragraph");
+      const companyName = DomTestHelpers.getElementById(
+        "companyname-paragraph"
+      );
+      const price = DomTestHelpers.getElementById("price-paragraph");
+
+      expect(symbol?.innerHTML).toBe(`Symbol: ${stockData.simbolo}`);
+      expect(companyName?.innerHTML).toBe(
+        `Company name: ${stockData.nome_da_empresa}`
+      );
+      expect(price?.innerHTML).toBe(`Price: $${stockData.cotacao}`);
     });
-    const screenErrorMessage = DomTestHelpers.getElementById("error-message");
-    expect(screenErrorMessage?.innerHTML).toBe(errorMessage);
   });
 
-  test("Should show the error message if GetStockByNameUseCase throws", async () => {
-    const errorMessage = FakeData.phrase();
-    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
+  test("Should display loading spinner when GetStockByNameUseCase is called", async () => {
+    const stockData = makeFakeStockInfoDto();
+    const getOneStockUseCase = makeGetStockByNameUseCaseStub();
+    jest.spyOn(getOneStockUseCase, "execute");
     jest
-      .spyOn(getStockByNameServiceMock, "execute")
+      .spyOn(getOneStockUseCase, "execute")
       .mockImplementationOnce(async () => {
-        throw new Error(errorMessage);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return Promise.resolve(stockData);
       });
+    makeSut({ getStockByNameUseCase: getOneStockUseCase });
+
+    await DomTestHelpers.changeInputValue("symbol-input", stockData.simbolo);
+    await DomTestHelpers.clickButton("submit-button");
+
+    const loadingSpinner = DomTestHelpers.getElementById("loading-spinner");
+    expect(loadingSpinner).toBeTruthy();
+  });
+
+  test("Should remove loading spinner when request is done", async () => {
+    const stockData = makeFakeStockInfoDto();
+    const getOneStockUseCase = makeGetStockByNameUseCaseStub();
+    jest.spyOn(getOneStockUseCase, "execute");
+    jest
+      .spyOn(getOneStockUseCase, "execute")
+      .mockImplementationOnce(async () => {
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return Promise.resolve(stockData);
+      });
+    makeSut({ getStockByNameUseCase: getOneStockUseCase });
+
+    await DomTestHelpers.changeInputValue("symbol-input", stockData.simbolo);
+    await DomTestHelpers.clickButton("submit-button");
+
     await waitFor(() => {
-      makeSut({ GetStockByNameUseCase: getStockByNameServiceMock });
+      const loadingSpinner = DomTestHelpers.getElementById("loading-spinner");
+      expect(loadingSpinner).toBeFalsy();
     });
+  });
+
+  test("Should display error message when GetStockByNameUseCase throws", async () => {
+    const getStockServiceStub = makeGetStockByNameUseCaseStub();
+    const errorMessage = FakeData.phrase();
+    jest
+      .spyOn(getStockServiceStub, "execute")
+      .mockRejectedValueOnce(new Error(errorMessage));
+    makeSut({ getStockByNameUseCase: getStockServiceStub });
+
+    await DomTestHelpers.changeInputValue("symbol-input", FakeData.word());
+    await DomTestHelpers.clickButton("submit-button");
+
     await waitFor(() => {
       const screenErrorMessage = DomTestHelpers.getElementById("error-message");
-      const loadingSpinner = DomTestHelpers.getElementById("loading-spinner");
       expect(screenErrorMessage?.innerHTML).toBe(errorMessage);
-      expect(loadingSpinner).toBeNull();
-    });
-  });
-
-  test("Should lock the input fields", async () => {
-    const stockData = makeFakeStockInfoDto();
-    const getStockByNameServiceMock = makeGetStockByNameUseCaseStub();
-    jest
-      .spyOn(getStockByNameServiceMock, "execute")
-      .mockResolvedValueOnce(Promise.resolve(stockData));
-    makeSut(
-      { GetStockByNameUseCase: getStockByNameServiceMock },
-      stockData.simbolo
-    );
-    await waitFor(() => {
-      const symbolInput = DomTestHelpers.getInputElementById("simbolo-input");
-      expect(symbolInput.disabled).toBeTruthy();
     });
   });
 });
