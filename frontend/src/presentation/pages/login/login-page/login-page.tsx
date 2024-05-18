@@ -24,14 +24,14 @@ export const LoginPage: React.FC<Props> = ({
 }: Props) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [lockSubmit, setLockSubmit] = useState(true);
+  const [lockSubmit, setLockSubmit] = useState(false);
   const [formError, setFormError] = useState({
     message: "",
     show: false,
   });
   const [loginData, setLoginData] = useState<LoginDto>({
-    email: "",
-    password: "",
+    email: "user@stock.com",
+    password: "stock_is_up_100%",
   });
 
   const onFormSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
