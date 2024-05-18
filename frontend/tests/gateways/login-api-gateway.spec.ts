@@ -25,7 +25,10 @@ describe("LoginApiGateway", () => {
     const clientPostSpy = jest.spyOn(clientPostRequestSender, "post");
     await sut.execute(loginData);
 
-    expect(clientPostSpy).toHaveBeenCalledWith(url, loginData);
+    expect(clientPostSpy).toHaveBeenCalledWith(url, {
+      username: loginData.email,
+      password: loginData.password,
+    });
     expect(clientPostSpy).toHaveBeenCalledTimes(1);
   });
 

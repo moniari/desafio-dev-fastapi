@@ -15,10 +15,10 @@ export class LoginApiGateway implements LoginApiInterface {
   }
 
   public async execute(loginData: LoginDto): Promise<string | null> {
-    const response = await this.clientPostRequestSender.post(
-      this.loginUrl,
-      loginData
-    );
+    const response = await this.clientPostRequestSender.post(this.loginUrl, {
+      username: loginData.email,
+      password: loginData.password,
+    });
     if (response && response.token) {
       return response.token;
     }
