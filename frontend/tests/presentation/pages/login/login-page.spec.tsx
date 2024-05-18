@@ -11,6 +11,7 @@ import { DomTestHelpers } from "tests/utils/dom/dom-test-helpers";
 import { render, waitFor } from "@testing-library/react";
 import { FakeData } from "tests/utils/data/fake-data";
 import React from "react";
+import { LoginApiGatewayStub } from "tests/utils/stubs/gateways/login-api-gateway-stub";
 
 type SutMockTypes = {
   validator?: ValidatorInterface;
@@ -19,8 +20,7 @@ type SutMockTypes = {
 
 const makeLoginUseCaseStub = (): LoginUseCase => {
   return new LoginUseCaseStub(
-    FakeData.url(),
-    new ClientPostRequestSenderStub(),
+    new LoginApiGatewayStub(),
     new TokenStorageStub()
   );
 };
@@ -132,9 +132,7 @@ describe("LoginPage", () => {
     const loginData = makeFakeLoginDto();
     const loginServiceMock = makeLoginUseCaseStub();
     const loginServiceSpy = jest.spyOn(loginServiceMock, "execute");
-    jest
-      .spyOn(loginServiceMock, "execute")
-      .mockReturnValueOnce(Promise.resolve(makeFakeLoginEntity()));
+    jest.spyOn(loginServiceMock, "execute").mockResolvedValueOnce(true);
     makeSut({ loginService: loginServiceMock });
 
     await DomTestHelpers.changeInputValue(
@@ -211,7 +209,7 @@ describe("LoginPage", () => {
     const loginServiceMock = makeLoginUseCaseStub();
     jest
       .spyOn(loginServiceMock, "execute")
-      .mockReturnValueOnce(Promise.resolve(new Error(mockErrorMessage)));
+      .mockResolvedValueOnce(new Error(mockErrorMessage));
     makeSut({ loginService: loginServiceMock });
 
     await DomTestHelpers.changeInputValue(
@@ -238,7 +236,7 @@ describe("LoginPage", () => {
     jest.spyOn(loginServiceMock, "execute");
     jest.spyOn(loginServiceMock, "execute").mockImplementationOnce(async () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      return Promise.resolve(makeFakeLoginEntity());
+      return Promise.resolve(true);
     });
     makeSut({ loginService: loginServiceMock });
 
@@ -262,7 +260,7 @@ describe("LoginPage", () => {
     jest.spyOn(loginServiceMock, "execute");
     jest.spyOn(loginServiceMock, "execute").mockImplementationOnce(async () => {
       await new Promise((resolve) => setTimeout(resolve, 500));
-      return Promise.resolve(makeFakeLoginEntity());
+      return Promise.resolve(true);
     });
     makeSut({ loginService: loginServiceMock });
 
