@@ -20,7 +20,7 @@ export class StockPriceApiGateway implements StockPriceApiInterface {
     authToken: string
   ): Promise<StockInfoDto | null | Error> {
     const response = await this.clientGetRequestSender.get(
-      `${this.apiUrl}?c=${symbol}`,
+      `${this.apiUrl}?q=${symbol}`,
       authToken
     );
     if (
