@@ -26,7 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-auth_token = APIKeyHeader(name='X-SECRET-1', scheme_name='auth_token')
+auth_token = APIKeyHeader(name='authorization', scheme_name='auth_token')
 logger = FileLogBuilderGateway("api_service")
 
 @app.post(
