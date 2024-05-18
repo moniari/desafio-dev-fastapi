@@ -1,4 +1,5 @@
 import { makeGetOneStockPageFactory } from "./factories/pages/stock/get-one-stock-page-factory";
+import { makePrivatePageProxyFactory } from "./factories/proxies/private-page-proxy-factory";
 import { HeaderComponent } from "src/presentation/components/header/header-component";
 import { makeLoginPageFactory } from "./factories/pages/login/login-page-factory";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -13,7 +14,13 @@ const Router = () => {
       <BrowserRouter>
         <Routes>
           <Route path="/" Component={makeLoginPageFactory} />
-          <Route path="/stock" Component={makeGetOneStockPageFactory} />
+          <Route
+            path="/stock"
+            Component={makePrivatePageProxyFactory(
+              makeGetOneStockPageFactory,
+              "/"
+            )}
+          />
         </Routes>
       </BrowserRouter>
     </>
