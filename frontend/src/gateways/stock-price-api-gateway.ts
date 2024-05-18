@@ -1,6 +1,7 @@
 import { ClientGetRequestSenderInterface } from "src/domain/abstract/adapters/client-get-request-sender-interface";
 import { StockPriceApiInterface } from "src/domain/abstract/gateways/stock-price-api-interface";
 import { StockInfoDto } from "src/domain/abstract/dtos/stock/stock-info-dto";
+import { ApiError } from "src/domain/errors/api-error";
 
 export class StockPriceApiGateway implements StockPriceApiInterface {
   private readonly apiUrl: string;
@@ -17,8 +18,8 @@ export class StockPriceApiGateway implements StockPriceApiInterface {
   public async execute(
     symbol: string,
     authToken: string
-  ): Promise<StockInfoDto | null> {
-    const response: StockInfoDto = await this.clientGetRequestSender.get(
+  ): Promise<StockInfoDto | null | Error> {
+    const response = await this.clientGetRequestSender.get(
       `${this.apiUrl}?c=${symbol}`,
       authToken
     );
@@ -29,6 +30,9 @@ export class StockPriceApiGateway implements StockPriceApiInterface {
       response.simbolo
     ) {
       return response;
+    }
+    if (response && response.message) {
+      return new ApiError(response.message);
     }
     return null;
   }

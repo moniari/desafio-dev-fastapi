@@ -3,6 +3,7 @@ import { ClientGetRequestSenderStub } from "tests/utils/stubs/http/client-get-re
 import { StockPriceApiGateway } from "src/gateways/stock-price-api-gateway";
 import { FakeData } from "tests/utils/data/fake-data";
 import { makeFakeStockInfoDto } from "tests/utils/data/dtos/stock/fake-stock-info-dto";
+import { ApiError } from "src/domain/errors/api-error";
 
 type SutTypes = {
   clientGetRequestSender: ClientGetRequestSenderInterface;
@@ -42,6 +43,17 @@ describe("StockPriceApiGateway", () => {
     const output = await sut.execute(FakeData.word(), FakeData.word());
 
     expect(output).toEqual(null);
+  });
+
+  test("Should return an api error if ClientGetRequestSender return a message", async () => {
+    const { sut, clientGetRequestSender } = makeSut();
+    const message = FakeData.word();
+    jest.spyOn(clientGetRequestSender, "get").mockResolvedValueOnce({
+      message: message,
+    });
+    const error = await sut.execute(FakeData.word(), FakeData.word());
+
+    expect(error).toEqual(new ApiError(message));
   });
 
   test("Should return null if ClientGetRequestSender do not have the stock info", async () => {

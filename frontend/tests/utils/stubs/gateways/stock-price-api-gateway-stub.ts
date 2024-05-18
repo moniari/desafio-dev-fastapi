@@ -6,7 +6,7 @@ export class StockPriceApiGatewayStub implements StockPriceApiInterface {
   public async execute(
     symbol: string,
     authToken: string
-  ): Promise<StockInfoDto | null> {
+  ): Promise<StockInfoDto | null | Error> {
     return makeFakeStockInfoDto();
   }
 }

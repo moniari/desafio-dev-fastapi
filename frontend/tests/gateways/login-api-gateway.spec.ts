@@ -1,4 +1,5 @@
 import { ClientPostRequestSenderInterface } from "src/domain/abstract/adapters/client-post-request-sender-interface";
+import { ApiError } from "src/domain/errors/api-error";
 import { LoginApiGateway } from "src/gateways/login-api-gateway";
 import { FakeData } from "tests/utils/data/fake-data";
 import { ClientPostRequestSenderStub } from "tests/utils/stubs/http/client-post-request-sender-stub";
@@ -66,6 +67,20 @@ describe("LoginApiGateway", () => {
     });
 
     expect(response).toBeNull();
+  });
+
+  test("Should return an api error if ClientPostRequestSender return a message", async () => {
+    const { sut, clientPostRequestSender } = makeSut();
+    const message = FakeData.word()
+    jest.spyOn(clientPostRequestSender, "post").mockResolvedValueOnce({
+      message: message
+    });
+    const error = await sut.execute({
+      email: FakeData.email(),
+      password: FakeData.word(),
+    });
+
+    expect(error).toEqual(new ApiError(message));
   });
 
   test("Should throw if ClientPostRequestSender throws", async () => {
