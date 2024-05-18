@@ -10,6 +10,7 @@ services:
       PROJECT_NAME: "Api Service"
       STOCK_SERVICE_URL: "http://stock_service:81"
       AUTH_SERVICE_URL: "http://auth_service:82"
+      LOG_SERVICE_URL: "http://log_service:83"
     ports:
       - "80:80"
     networks:
@@ -23,7 +24,8 @@ services:
     environment:
       API_VERSION: "1.0.0"
       PROJECT_NAME: "Stock Service"
-      API_SERVICE_URL: "http://stock_service:80"
+      API_SERVICE_URL: "http://api_service:80"
+      LOG_SERVICE_URL: "http://log_service:83"
     ports:
       - "81:81"
     networks:
@@ -39,9 +41,26 @@ services:
       PROJECT_NAME: "Auth Service"
       USERNAME: "user@stock.com"
       PASSWORD: "stock_is_up_100%"
-      API_SERVICE_URL: "http://stock_service:80"
+      API_SERVICE_URL: "http://api_service:80"
+      LOG_SERVICE_URL: "http://log_service:83"
     ports:
       - "82:82"
+    networks:
+      - app-network
+
+  log_service:
+    container_name: log_service
+    build:
+      context: log_service
+    image: log_service
+    environment:
+      API_VERSION: "1.0.0"
+      PROJECT_NAME: "Log Service"
+      API_SERVICE_URL: "http://api_service:80"
+      AUTH_SERVICE_URL: "http://auth_service:81"
+      STOCK_SERVICE_URL: "http://stock_service:82"
+    ports:
+      - "83:83"
     networks:
       - app-network
 
