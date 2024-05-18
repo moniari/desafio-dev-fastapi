@@ -14,7 +14,7 @@ export class StockPriceApiGateway implements StockPriceApiInterface {
     this.clientGetRequestSender = clientGetRequestSender;
   }
 
-  public async execute(symbol: string): Promise<StockInfoDto | null> {
+  public async execute(symbol: string, authToken = ''): Promise<StockInfoDto | null> {
     const response: StockInfoDto = await this.clientGetRequestSender.get(
       `${this.apiUrl}?c=${symbol}`
     );

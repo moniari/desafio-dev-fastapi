@@ -7,6 +7,7 @@ import { StockEntity } from "src/domain/abstract/entities/stock-entity";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./styles.scss";
+import { StockInfoDto } from "src/domain/abstract/dtos/stock/stock-info-dto";
 
 type Props = {
   GetStockByNameUseCase: GetStockByNameUseCase;
@@ -21,8 +22,10 @@ export const GetOneStockPage: React.FC<Props> = ({
     message: "",
     show: false,
   });
-  const [stockData, setStockData] = useState<StockEntity>({
-    symbol: "",
+  const [stockData, setStockData] = useState<StockInfoDto>({
+    simbolo: "",
+    nome_da_empresa: "",
+    cotacao: 0,
   });
 
   const handleError = (message: string) => {
@@ -36,8 +39,7 @@ export const GetOneStockPage: React.FC<Props> = ({
   useEffect(() => {
     if (id) {
       setLoading(true);
-      GetStockByNameUseCase
-        .execute(id)
+      GetStockByNameUseCase.execute(id)
         .then((data) => {
           if (data instanceof Error) {
             handleError(data.message);
@@ -62,8 +64,8 @@ export const GetOneStockPage: React.FC<Props> = ({
         <InputComponent
           label="Symbol"
           type="text"
-          name="symbol"
-          value={stockData?.symbol?.toString() || ""}
+          name="simbolo"
+          value={stockData?.simbolo?.toString() || ""}
           onChange={() => {}}
           disabled={true}
         />

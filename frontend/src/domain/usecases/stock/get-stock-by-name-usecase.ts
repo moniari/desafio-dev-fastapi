@@ -1,37 +1,28 @@
-import { ClientGetRequestSenderInterface } from "../../abstract/adapters/client-get-request-sender-interface";
+import { StockPriceApiInterface } from "src/domain/abstract/gateways/stock-price-api-interface";
 import { TokenStorageInterface } from "../../abstract/adapters/token-storage-interface";
-import { StockEntity } from "src/domain/abstract/entities/stock-entity";
+import { StockInfoDto } from "src/domain/abstract/dtos/stock/stock-info-dto";
 import { DefaultError } from "../../errors/default-error";
-import { ApiError } from "../../errors/api-error";
 
 export class GetStockByNameUseCase {
-  private readonly url: string;
-  private readonly clientGetRequestSender: ClientGetRequestSenderInterface;
+  private readonly stockPriceApi: StockPriceApiInterface;
   private readonly tokenStorage: TokenStorageInterface;
 
   public constructor(
-    stockSearchUrl: string,
-    clientGetRequestSender: ClientGetRequestSenderInterface,
+    stockPriceApi: StockPriceApiInterface,
     tokenStorage: TokenStorageInterface
   ) {
-    this.url = stockSearchUrl;
-    this.clientGetRequestSender = clientGetRequestSender;
+    this.stockPriceApi = stockPriceApi;
     this.tokenStorage = tokenStorage;
   }
 
-  public async execute(stockId: string): Promise<StockEntity | Error> {
+  public async execute(stockName: string): Promise<StockInfoDto | Error> {
     const token = await this.tokenStorage.get("token");
     if (!token) {
       return new DefaultError();
     }
-    const data = await this.clientGetRequestSender.get(
-      `${this.url}/${stockId}`,
-      token
-    );
+    const data = await this.stockPriceApi.execute(stockName, token);
     if (!data) {
       return new DefaultError();
-    } else if (data.error) {
-      return new ApiError(data.error);
     } else {
       return data;
     }
