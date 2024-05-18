@@ -7,9 +7,18 @@ import { makeFakeLoginDto } from "tests/utils/data/dtos/login/fake-login-dto";
 import { ValidatorStub } from "tests/utils/stubs/validation/validator-stub";
 import { LoginUseCase } from "src/domain/usecases/login/login-usecase";
 import { DomTestHelpers } from "tests/utils/dom/dom-test-helpers";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { render, waitFor } from "@testing-library/react";
 import { FakeData } from "tests/utils/data/fake-data";
 import React from "react";
+
+jest.mock("react-router-dom", () => {
+  const originalModule = jest.requireActual("react-router-dom");
+  return {
+    ...originalModule,
+    useNavigate: jest.fn(),
+  };
+});
 
 type SutMockTypes = {
   validator?: ValidatorInterface;
@@ -275,6 +284,31 @@ describe("LoginPage", () => {
     await waitFor(() => {
       const loadingSpinner = DomTestHelpers.getElementById("loading-spinner");
       expect(loadingSpinner).toBeFalsy();
+    });
+  });
+
+  test("Should redirect to home page if login was done", async () => {
+    const navigateMock = jest.fn();
+    require("react-router-dom").useNavigate.mockImplementation(
+      () => navigateMock
+    );
+    const loginServiceMock = makeLoginUseCaseStub();
+    jest.spyOn(loginServiceMock, "execute");
+    jest.spyOn(loginServiceMock, "execute").mockImplementationOnce(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return Promise.resolve(true);
+    });
+    makeSut({ loginService: loginServiceMock });
+
+    await DomTestHelpers.changeInputValue("email-input", FakeData.email());
+    await DomTestHelpers.changeInputValue(
+      "password-input",
+      FakeData.password()
+    );
+    await DomTestHelpers.clickButton("submit-button");
+
+    await waitFor(() => {
+      expect(navigateMock).toHaveBeenCalledWith("/stock");
     });
   });
 });

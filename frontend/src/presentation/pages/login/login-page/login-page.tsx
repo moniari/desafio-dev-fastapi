@@ -11,6 +11,7 @@ import {
   ButtonComponent,
   ButtonTypeEnum,
 } from "src/presentation/components/button/button-component";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
   validator: ValidatorInterface;
@@ -21,6 +22,7 @@ export const LoginPage: React.FC<Props> = ({
   validator,
   loginUseCase,
 }: Props) => {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [lockSubmit, setLockSubmit] = useState(true);
   const [formError, setFormError] = useState({
@@ -39,6 +41,8 @@ export const LoginPage: React.FC<Props> = ({
       const error = await loginUseCase.execute(loginData);
       if (error instanceof Error) {
         handleFormError(error.message);
+      } else {
+        navigate("/stock");
       }
     } catch (error) {
       handleFormError("An error occurred");
