@@ -122,8 +122,9 @@ async def makeLogin(body: LoginDto):
         },
     },
 )
-async def getStock(symbol: str, token: str = Depends(auth_token)):
+async def getStock(q: str, token: str = Depends(auth_token)):
     try:
+        symbol = q.upper()
         logger.log("REQUEST => GET /stock: " + json.dumps({"symbol": symbol, "token": token}))
         middleware = makeUserAuthMiddlewareFactory()
         validToken = middleware.execute(token)
