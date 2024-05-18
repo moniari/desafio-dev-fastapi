@@ -1,6 +1,5 @@
-import { ClientPostRequestSenderStub } from "tests/utils/stubs/http/client-post-request-sender-stub";
 import { ValidatorInterface } from "src/presentation/abstract/validators/validator-interface";
-import { makeFakeLoginEntity } from "tests/utils/data/entities/login/fake-login-entity";
+import { LoginApiGatewayStub } from "tests/utils/stubs/gateways/login-api-gateway-stub";
 import { LoginUseCaseStub } from "tests/utils/stubs/usecases/login/login-usecase-stub";
 import { TokenStorageStub } from "tests/utils/stubs/adapters/token-storage-stub";
 import { LoginPage } from "src/presentation/pages/login/login-page/login-page";
@@ -11,7 +10,6 @@ import { DomTestHelpers } from "tests/utils/dom/dom-test-helpers";
 import { render, waitFor } from "@testing-library/react";
 import { FakeData } from "tests/utils/data/fake-data";
 import React from "react";
-import { LoginApiGatewayStub } from "tests/utils/stubs/gateways/login-api-gateway-stub";
 
 type SutMockTypes = {
   validator?: ValidatorInterface;

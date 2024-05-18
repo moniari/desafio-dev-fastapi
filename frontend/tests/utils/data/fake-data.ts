@@ -6,6 +6,7 @@ export const FakeData = {
   word: (length = 10): string => faker.string.alphanumeric({ length }),
   id: (): string => faker.string.uuid(),
   numberInteger: (): number => faker.number.int(),
+  numberFloat: (): number => faker.number.float(),
   phrase: (): string => faker.lorem.words(),
   url: (): string => faker.internet.url(),
   bool: (): boolean => faker.datatype.boolean(),

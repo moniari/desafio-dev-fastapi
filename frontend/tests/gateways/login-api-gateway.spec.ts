@@ -65,14 +65,18 @@ describe("LoginApiGateway", () => {
     expect(response).toBeNull();
   });
 
-//   test("Should throw if if ClientPostRequestSender return null", async () => {
-//     const { sut, clientPostRequestSender } = makeSut();
-//     jest.spyOn(clientPostRequestSender, "post").mockResolvedValueOnce(null);
-//     const response = await sut.execute({
-//       email: FakeData.email(),
-//       password: FakeData.word(),
-//     });
+  test("Should throw if ClientPostRequestSender throws", async () => {
+    const { sut, clientPostRequestSender } = makeSut();
+    jest.spyOn(clientPostRequestSender, "post").mockImplementationOnce(() => {
+      throw new Error();
+    });
 
-//     expect(response).toBeNull();
-//   });
+    expect(
+      async () =>
+        await sut.execute({
+          email: FakeData.email(),
+          password: FakeData.word(),
+        })
+    ).rejects.toThrow();
+  });
 });
