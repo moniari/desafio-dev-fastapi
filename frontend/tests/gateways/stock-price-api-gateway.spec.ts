@@ -25,7 +25,7 @@ describe("StockPriceApiGateway", () => {
     const clientGetSpy = jest.spyOn(clientGetRequestSender, "get");
     await sut.execute(symbol, token);
 
-    expect(clientGetSpy).toHaveBeenCalledWith(`${url}?c=${symbol}`, token);
+    expect(clientGetSpy).toHaveBeenCalledWith(`${url}?q=${symbol}`, token);
   });
 
   test("Should return the stock info from ClientGetRequestSender", async () => {
