@@ -19,18 +19,19 @@ describe("StockPriceApiGateway", () => {
   test("Should call ClientGetRequestSender with correct values", async () => {
     const url = FakeData.url();
     const symbol = FakeData.word();
+    const token = FakeData.word();
     const { sut, clientGetRequestSender } = makeSut(url);
     const clientGetSpy = jest.spyOn(clientGetRequestSender, "get");
-    await sut.execute(symbol);
+    await sut.execute(symbol, token);
 
-    expect(clientGetSpy).toHaveBeenCalledWith(`${url}?c=${symbol}`);
+    expect(clientGetSpy).toHaveBeenCalledWith(`${url}?c=${symbol}`, token);
   });
 
   test("Should return the stock info from ClientGetRequestSender", async () => {
     const { sut, clientGetRequestSender } = makeSut();
     const stockInfo = makeFakeStockInfoDto();
     jest.spyOn(clientGetRequestSender, "get").mockResolvedValueOnce(stockInfo);
-    const output = await sut.execute(FakeData.word());
+    const output = await sut.execute(FakeData.word(), FakeData.word());
 
     expect(output).toEqual(stockInfo);
   });
@@ -38,7 +39,7 @@ describe("StockPriceApiGateway", () => {
   test("Should return null if ClientGetRequestSender returns null", async () => {
     const { sut, clientGetRequestSender } = makeSut();
     jest.spyOn(clientGetRequestSender, "get").mockResolvedValueOnce(null);
-    const output = await sut.execute(FakeData.word());
+    const output = await sut.execute(FakeData.word(), FakeData.word());
 
     expect(output).toEqual(null);
   });
@@ -46,7 +47,7 @@ describe("StockPriceApiGateway", () => {
   test("Should return null if ClientGetRequestSender do not have the stock info", async () => {
     const { sut, clientGetRequestSender } = makeSut();
     jest.spyOn(clientGetRequestSender, "get").mockResolvedValueOnce({});
-    const output = await sut.execute(FakeData.word());
+    const output = await sut.execute(FakeData.word(), FakeData.word());
 
     expect(output).toEqual(null);
   });
@@ -57,6 +58,8 @@ describe("StockPriceApiGateway", () => {
       throw new Error();
     });
 
-    expect(async () => await sut.execute(FakeData.word())).rejects.toThrow();
+    expect(
+      async () => await sut.execute(FakeData.word(), FakeData.word())
+    ).rejects.toThrow();
   });
 });

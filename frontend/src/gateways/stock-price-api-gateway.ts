@@ -14,9 +14,13 @@ export class StockPriceApiGateway implements StockPriceApiInterface {
     this.clientGetRequestSender = clientGetRequestSender;
   }
 
-  public async execute(symbol: string, authToken = ''): Promise<StockInfoDto | null> {
+  public async execute(
+    symbol: string,
+    authToken: string
+  ): Promise<StockInfoDto | null> {
     const response: StockInfoDto = await this.clientGetRequestSender.get(
-      `${this.apiUrl}?c=${symbol}`
+      `${this.apiUrl}?c=${symbol}`,
+      authToken
     );
     if (
       response &&
