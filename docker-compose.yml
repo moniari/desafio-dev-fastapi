@@ -64,6 +64,21 @@ services:
     networks:
       - app-network
 
+  frontend:
+    container_name: frontend
+    build:
+      context: frontend
+    image: frontend
+    depends_on:
+      - api_service
+      - stock_service
+      - auth_service
+      - log_service
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
