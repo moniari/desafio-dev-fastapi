@@ -1,0 +1,18 @@
+{
+    "collectCoverageFrom": [
+      "<rootDir>/src/**/*.{ts,tsx}",
+      "!<rootDir>/src/index.tsx"
+    ],
+    "coverageDirectory": "coverage",
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest",
+      "^.+\\.(js|jsx)$": "babel-jest"
+    },
+    "roots": ["<rootDir>/src", "<rootDir>/tests"],
+    "moduleNameMapper": {
+      "tests/(.+)": "<rootDir>/tests/$1",
+      "src/(.+)": "<rootDir>/src/$1"
+    }
+  }
+  
