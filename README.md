@@ -1,4 +1,4 @@
-# desafio-dev-fastapi-moniari
+# stock-price-tracker
 
 ## Project Overview
 
