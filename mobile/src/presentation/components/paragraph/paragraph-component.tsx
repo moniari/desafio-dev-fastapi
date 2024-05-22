@@ -6,7 +6,6 @@ const styles = {
   color: GlobalStyles.colors.DarkColor,
   fontSize: 17,
   marginBottom: 8,
-  // fontWeight: 'bold',
 };
 
 type ParagraphProps = {
@@ -18,7 +17,7 @@ export const ParagraphComponent: React.FC<ParagraphProps> = ({
   name,
   message,
 }) => {
-  return <Text style={styles}>{message}</Text>;
+  return <Text style={styles as any}>{message}</Text>;
 };
 
 export default ParagraphComponent;

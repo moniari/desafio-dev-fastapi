@@ -7,8 +7,8 @@ const styles = {
     backgroundColor: GlobalStyles.colors.MediumColor,
     padding: 20,
     textAlign: "center",
-    // position: 'absolute',
-    // width: '100%',
+    position: 'absolute',
+    width: '100%',
     top: 0,
     left: 0,
     zIndex: 999,
@@ -22,7 +22,7 @@ const styles = {
 
 export const HeaderComponent: React.FC = () => {
   return (
-    <View style={styles.header}>
+    <View style={styles.header as any}>
       <Text style={styles.headerTitle}>Stock Price Tracker</Text>
     </View>
   );

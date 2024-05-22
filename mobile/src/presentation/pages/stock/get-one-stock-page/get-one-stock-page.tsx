@@ -57,7 +57,7 @@ export const GetOneStockPage: React.FC<Props> = ({
           handleError(data.message);
         } else {
           setStockData(data);
-          handleError("");
+          setFormError((old) => ({ ...old, show: false }));
         }
       })
       .catch((error) => {
@@ -111,22 +111,24 @@ export const GetOneStockPage: React.FC<Props> = ({
         />
       </View>
 
-      {loading && <LoadingSpinner loading={loading} />}
-
-      <View style={styles.formContainer}>
-        <ParagraphComponent
-          name="symbol"
-          message={`Symbol: ${stockData.simbolo}`}
-        />
-        <ParagraphComponent
-          name="companyname"
-          message={`Company name: ${stockData.nome_da_empresa}`}
-        />
-        <ParagraphComponent
-          name="price"
-          message={`Price: $${stockData.cotacao}`}
-        />
-      </View>
+      {loading ? (
+        <LoadingSpinner loading={loading} />
+      ) : (
+        <View style={styles.formContainer}>
+          <ParagraphComponent
+            name="symbol"
+            message={`Symbol: ${stockData.simbolo}`}
+          />
+          <ParagraphComponent
+            name="companyname"
+            message={`Company name: ${stockData.nome_da_empresa}`}
+          />
+          <ParagraphComponent
+            name="price"
+            message={`Price: $${stockData.cotacao}`}
+          />
+        </View>
+      )}
     </View>
   );
 };

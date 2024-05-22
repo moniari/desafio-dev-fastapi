@@ -4,25 +4,27 @@ import { GlobalStyles } from "src/presentation/styles/global-styles";
 
 const styles = {
   button: {
-    color: GlobalStyles.colors.MediumLightColor,
+    backgroundColor: GlobalStyles.colors.DarkColor,
     border: "none",
     borderRadius: 4,
     padding: 10,
     paddingLeft: 20,
     paddingRight: 20,
-    fontSize: 16,
     transition: "background-color 0.3s",
   },
   disabled: {
-    color: GlobalStyles.colors.LightColor,
     backgroundColor: GlobalStyles.colors.MediumLightColor,
   },
   enabled: {
-    color: GlobalStyles.colors.LightColor,
     backgroundColor: GlobalStyles.colors.MediumDarkColor,
   },
   hover: {
     backgroundColor: GlobalStyles.colors.DarkColor,
+  },
+  text: {
+    color: GlobalStyles.colors.LightColor,
+    fontSize: 16,
+    textAlign: "center",
   },
 };
 
@@ -61,7 +63,7 @@ export const ButtonComponent: React.FC<SubmitButtonProps> = ({
       disabled={disabled}
       style={buttonStyle}
     >
-      <Text>{name}</Text>
+      <Text style={styles.text as any}>{name}</Text>
     </TouchableOpacity>
   );
 };

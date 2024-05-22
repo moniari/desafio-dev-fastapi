@@ -62,19 +62,17 @@ export const LoginPage: React.FC<Props> = ({
   const onEmailInputChange = (value: string) => {
     setLoginData((old) => ({ ...old, email: value }));
     setFormError((old) => ({ ...old, show: true }));
-    validate()
+    validate();
   };
 
   const onPasswordInputChange = (value: string) => {
     setLoginData((old) => ({ ...old, password: value }));
     setFormError((old) => ({ ...old, show: true }));
-    validate()
+    validate();
   };
 
   const validate = () => {
-    console.log(loginData)
     const error = validator.validate(loginData);
-    console.log(error);
     if (error) {
       handleFormError(error.message);
       setLockSubmit(true);
@@ -82,10 +80,10 @@ export const LoginPage: React.FC<Props> = ({
       setFormError((old) => ({ ...old, show: false, message: "" }));
       setLockSubmit(false);
     }
-  }
+  };
 
   useEffect(() => {
-    validate()
+    validate();
   }, [loginData]);
 
   const styles = {
@@ -100,43 +98,46 @@ export const LoginPage: React.FC<Props> = ({
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
-      padding: 20
+      padding: 20,
     },
   };
 
   return (
     <View style={styles.loginPage}>
-      <View style={styles.formContainer}>
-        <FormTitleComponent title="Login" />
+      {loading ? (
+        <LoadingSpinner loading={loading} />
+      ) : (
+        <View style={styles.formContainer}>
+          <FormTitleComponent title="Login" />
 
-        <InputComponent
-          label="Email"
-          type="email"
-          name="email"
-          value={loginData?.email?.toString() || ""}
-          onChange={onEmailInputChange}
-          disabled={false}
-        />
+          <InputComponent
+            label="Email"
+            type="email"
+            name="email"
+            value={loginData?.email?.toString() || ""}
+            onChange={onEmailInputChange}
+            disabled={false}
+          />
 
-        <InputComponent
-          label="Password"
-          type="password"
-          name="password"
-          value={loginData?.password?.toString() || ""}
-          onChange={onPasswordInputChange}
-          disabled={false}
-        />
-        {formError.show && (
-          <ErrorMessageComponent message={formError.message} />
-        )}
-        <ButtonComponent
-          disabled={lockSubmit}
-          name="Submit"
-          type={ButtonTypeEnum.SUBMIT}
-          onClickCallback={onFormSubmit}
-        />
-      </View>
-      <LoadingSpinner loading={loading} />
+          <InputComponent
+            label="Password"
+            type="password"
+            name="password"
+            value={loginData?.password?.toString() || ""}
+            onChange={onPasswordInputChange}
+            disabled={false}
+          />
+          {formError.show && (
+            <ErrorMessageComponent message={formError.message} />
+          )}
+          <ButtonComponent
+            disabled={lockSubmit}
+            name="Submit"
+            type={ButtonTypeEnum.SUBMIT}
+            onClickCallback={onFormSubmit}
+          />
+        </View>
+      )}
     </View>
   );
 };

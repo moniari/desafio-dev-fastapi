@@ -4,16 +4,16 @@ import { GlobalStyles } from "src/presentation/styles/global-styles";
 
 const styles = {
   inputField: {
-    // display: 'flex',
+    display: 'flex',
     marginBottom: 16,
   },
   fieldLabel: {
     fontSize: 17,
-    // fontWeight: 'bold',
+    fontWeight: 'bold',
     marginBottom: 8,
   },
   input: {
-    // width: '100%',
+    width: '100%',
     padding: 8,
     marginBottom: 0,
     borderWidth: 1,
@@ -41,13 +41,13 @@ export const InputComponent: React.FC<InputFieldProps> = ({
   onChange,
 }) => {
   return (
-    <View style={styles.inputField}>
-      <Text style={styles.fieldLabel}>{label}</Text>
+    <View style={styles.inputField as any}>
+      <Text style={styles.fieldLabel as any}>{label}</Text>
       <TextInput
         onChangeText={onChange}
         value={value}
         editable={!disabled}
-        style={styles.input}
+        style={styles.input as any}
       />
     </View>
   );

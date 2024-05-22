@@ -1,13 +1,17 @@
 import React from "react";
-import { Text } from "react-native";
+import { Text, View } from "react-native";
 import { GlobalStyles } from "src/presentation/styles/global-styles";
 
 const styles = {
-  fontSize: 24,
-  marginBottom: 20,
-  color: GlobalStyles.colors.DarkColor,
-  // fontWeight: 'bold',
-  // textAlign: 'center',
+  container: {
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 24,
+    color: GlobalStyles.colors.DarkColor,
+    fontWeight: "bold",
+  },
 };
 
 type FormTitleProps = {
@@ -15,5 +19,10 @@ type FormTitleProps = {
 };
 
 export const FormTitleComponent: React.FC<FormTitleProps> = ({ title }) => {
-  return <Text style={styles}>{title}</Text>;
+  return (
+    <View style={styles.container as any}>
+      <Text style={styles.title as any}>{title}</Text>
+    </View>
+  );
 };
+

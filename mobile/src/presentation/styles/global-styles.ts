@@ -1,8 +1,4 @@
 export const GlobalStyles = {
-  boxSizing: "border-box",
-  margin: 0,
-  fontFamily: "monospace",
-  color: "#132a13",
   colors: {
     Black: "#000000",
     DarkColor: "#132a13",
