@@ -43,9 +43,17 @@ docker compose up --build
 - **Routes**:
   - `/log`: Route to receive the logs.
 
-## Frontend
+## Frontend Web
 
 - **URL**: [http://localhost:3000](http://localhost:3000)
+
+## Frontend Mobile
+
+To run the frontend mobile version, enter the frontend-mobile folder and run the following commands:
+```sh
+npm install
+npm run android
+```
 
 ## Diagrams
 
