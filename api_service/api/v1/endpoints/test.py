@@ -1,8 +1,0 @@
-from fastapi import APIRouter
-
-router = APIRouter()
-
-
-@router.get("/")
-async def test():
-    return {"message": "Hello from api service"}

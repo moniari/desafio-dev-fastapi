@@ -1,58 +1,64 @@
-# Desafio Python Moniari
+# desafio-dev-fastapi-moniari
 
-## Descrição
+## Project Overview
 
-Este projeto foi desenvolvido para avaliar suas habilidades com tecnologias de back-end, focando em Python, APIs REST, e arquitetura de serviços desacoplados.
+This project demonstrates a backend split into microservices made with Python, a frontend made with TypeScript, utilizing Test-Driven Development (TDD) and Clean Architecture principles.
 
-## Tarefa
+## Running the Project
 
-O desafio consiste em criar uma API simples utilizando Python (**FastAPI**), que permita aos usuários consultar cotações de ações.
-O projeto é dividido em dois serviços distintos:
-
-- Uma API voltada para o usuário final, que processa solicitações de usuários registrados em busca de informações sobre cotações de ações.
-- Um serviço interno agregador de cotações, responsável por consultar APIs externas para buscar as cotações solicitadas pelos usuários.
-
-## Requisitos Mínimos
-
-### Serviço de API
-
-- Os endpoints deste serviço devem exigir **autenticação**, não permitindo solicitações anônimas. Cada solicitação deve ser autenticada utilizando Basic Authentication (exemplo: `Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==` onde o token é a conversão em Base64 de username:senha).
-
-- Ao receber uma solicitação de cotação de ação (através do endpoint dedicado no serviço de API), se a ação for encontrada, o serviço deve registrar no console o usuário requisitante e a ação solicitada.
-
-- A resposta do serviço de API deve seguir o formato: `GET /stock?q=aapl.us`
-
-```python
-{
-  "simbolo": "AAPL.US",
-  "nome_da_empresa": "APPLE",
-  "cotacao": 123
-}
+To run the project using Docker, execute the following command:
+```sh
+docker compose up --build
 ```
 
-O valor da cotação deve ser extraído do campo `close` retornado pelo serviço de cotações.
+## Services
 
-- Todas as respostas dos endpoints devem ser em formato JSON.
+### Api Service
 
-### Serviço de Cotações
+- **Description**: Acts as the main entry point to the backend.
+- **Documentation**: [http://localhost:80/docs](http://localhost:80/docs)
+- **Routes**:
+  - `/login`: Route to login.
+  - `/stock?q={name}`: Route to get stock data by name.
 
-- Considerando que este serviço é interno, solicitações para seus endpoints não requerem autenticação.
-- Ao receber uma solicitação de cotação, este serviço deve consultar uma API externa para obter as informações necessárias. Para este desafio, utilize a seguinte API: `https://stooq.com/q/l/?s={codigo_da_acao}&f=sd2t2ohlcvn&h&e=csv`.
-- O `{codigo_da_acao}` deve ser substituído pelo código da ação desejada pelo usuário.
-- Uma lista de códigos de ações disponíveis pode ser encontrada em: https://stooq.com/t/?i=518
+### Stock Service
 
-### Mecanismo de Log
+- **Description**: Processes and sends stock data.
+- **Documentation**: [http://localhost:81/docs](http://localhost:81/docs)
+- **Routes**:
+  - `/stock?symbol={name}`: Route to consult the stock by name.
 
-- Ambos os serviços, **Serviço de API** e **Serviço de Cotações**, devem implementar um **mecanismo de log** que registre as operações realizadas.
-- Os logs gerados por ambos os serviços devem ser armazenados em uma pasta denominada `logs` dentro do diretório do projeto.
-- Os arquivos de log devem ter a extensão `.log`.
-- É importante que os logs incluam informações detalhadas sobre as solicitações processadas, incluindo timestamp, tipo de solicitação, dados da solicitação (se aplicável) e quaisquer mensagens de erro ou alertas gerados durante o processamento.
+### Auth Service
 
-## Arquitetura
+- **Description**: Handles token generation and authentication.
+- **Documentation**: [http://localhost:82/docs](http://localhost:82/docs)
+- **Routes**:
+  - `/login`: Route to generate a token.
+  - `/validate-token`: Route to authenticate a token.
 
-![Diagrama de Arquitetura](arquitetura.png)
+### Log Service
 
-1. Um usuário solicita a cotação atual de uma ação da Apple: `GET /stock?q=aapl.us`
-2. O serviço de API encaminha a solicitação para o serviço de cotações para obter as informações necessárias.
-3. O serviço de cotações consulta a API externa, processa a resposta e retorna as informações para o serviço de API.
-4. As informações são formatadas e enviadas de volta ao usuário.
+- **Description**: Responsible for logging information about the other services into files located in its logs directory.
+- **Documentation**: [http://localhost:83/docs](http://localhost:83/docs)
+- **Routes**:
+  - `/log`: Route to receive the logs.
+
+## Frontend
+
+- **URL**: [http://localhost:3000](http://localhost:3000)
+
+## Diagrams
+
+### Backend Microservices Architecture
+![Backend Microservices Architecture](diagrams/backend/microservices.png)
+
+### Frontend Login Architecture
+![Frontend Login Architecture](diagrams/frontend/login.png)
+
+### Frontend Get Stock Data Architecture
+![Frontend Get Stock Data Architecture](diagrams/frontend/get-stock-data.png)
+
+## Author
+
+Douglas Volcato  
+[GitHub](https://github.com/DouglasVolcato)
